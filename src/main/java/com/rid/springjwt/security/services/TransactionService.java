@@ -1,10 +1,15 @@
 package com.rid.springjwt.security.services;
 
+import com.rid.springjwt.mapper.TransactionMapper;
 import com.rid.springjwt.models.ReportFilter;
 import com.rid.springjwt.models.Transaction;
+import com.rid.springjwt.models.TransactionDTO;
 import com.rid.springjwt.models.User;
 import com.rid.springjwt.repository.TransactionRepository;
 import com.rid.springjwt.repository.UserRepository;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.PropertyMap;
+import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -12,12 +17,11 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
 import java.math.BigDecimal;
-import java.time.Instant;
 
 import java.time.LocalDate;
-import java.util.Date;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -31,9 +35,17 @@ public class TransactionService {
     UserRepository userRepository;
 
 
+    TransactionMapper transactionMapper;
+
+
+    private final ModelMapper modelMapper;
+
+
+
     private final EntityManager entityManager;
 
-    public TransactionService(EntityManager entityManager) {
+    public TransactionService(ModelMapper modelMapper, EntityManager entityManager) {
+        this.modelMapper = modelMapper;
         this.entityManager = entityManager;
     }
 
@@ -69,9 +81,8 @@ public class TransactionService {
         return transactionRepository.findbyid(user.get().getId());
     }
 
-    public List<Transaction> historyReport(ReportFilter reportFilter){
+    public List<TransactionDTO> historyReport(ReportFilter reportFilter){
         StringBuilder sql = new StringBuilder().append("SELECT * from Transaction t where t.id > 0");
-
 
         if (reportFilter.getUserId() != null){
             sql.append(" and t.user_id="+reportFilter.getUserId());
@@ -86,10 +97,15 @@ public class TransactionService {
             java.sql.Date date = new java.sql.Date(reportFilter.getEndDate().getTime());
             sql.append(" and t.date < '"+date.toString()+"'");
         }
-
         Query query = entityManager.createNativeQuery(sql.toString(),Transaction.class);
         List<Transaction> customerList = query.getResultList();
-        return customerList;
+
+        return  customerList
+                .stream()
+                .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
+                .collect(Collectors.toList());
+
+
 
     }
 

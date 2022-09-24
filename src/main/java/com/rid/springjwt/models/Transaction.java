@@ -5,6 +5,7 @@ import com.sun.istack.NotNull;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.Date;
@@ -15,16 +16,19 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
+    @NotBlank
     private String name;
 
     private BigDecimal poin;
 
+    @NotBlank
     private BigDecimal Nominal;
 
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date")
     private LocalDate date;
 
+    @NotBlank
     @ManyToOne(optional = false)
     private User User;
 

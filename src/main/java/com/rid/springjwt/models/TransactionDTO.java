@@ -8,20 +8,29 @@ import java.util.Date;
 
 public class TransactionDTO  {
 
-    private long id;
+
     private String name;
     private Integer poin;
     private Integer Nominal;
     private Date date;
-    private User User;
+    private String username;
+//    private User user;
 
-    public long getId() {
-        return id;
+    public String getUsername() {
+        return username;
     }
 
-    public void setId(long id) {
-        this.id = id;
+    public void setUsername(String username) {
+        this.username = username;
     }
+
+//    public User getUser() {
+//        return user;
+//    }
+//
+//    public void setUser(User user) {
+//        this.user = user;
+//    }
 
     public String getName() {
         return name;
@@ -31,22 +40,12 @@ public class TransactionDTO  {
         this.name = name;
     }
 
-
-
     public Date getDate() {
         return date;
     }
 
     public void setDate(Date date) {
         this.date = date;
-    }
-
-    public com.rid.springjwt.models.User getUser() {
-        return User;
-    }
-
-    public void setUser(com.rid.springjwt.models.User user) {
-        User = user;
     }
 
     public Integer getPoin() {
