@@ -6,19 +6,28 @@ import com.rid.springjwt.models.DTO.TransactionDTO;
 import com.rid.springjwt.models.User;
 import com.rid.springjwt.repository.TransactionRepository;
 import com.rid.springjwt.repository.UserRepository;
+import net.sf.jasperreports.engine.*;
+import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
+import org.exolab.castor.types.DateTime;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.ResourceUtils;
 
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 
+import java.sql.Date;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 import java.util.stream.Collectors;
 
 @Service
@@ -74,7 +83,7 @@ public class TransactionService {
         return transactionRepository.findbyid(user.get().getId());
     }
 
-    public List<TransactionDTO> historyReport(ReportFilter reportFilter){
+    public List<TransactionDTO> historyReport(ReportFilter reportFilter) throws JRException, FileNotFoundException {
         StringBuilder sql = new StringBuilder().append("SELECT * from Transaction t where t.id > 0");
 
         if (reportFilter.getUserId() != null){
@@ -94,15 +103,26 @@ public class TransactionService {
         List<Transaction> customerList = query.getResultList();
         TypeMap<Transaction, TransactionDTO> propertyMapper = this.modelMapper.createTypeMap(Transaction.class, TransactionDTO.class);
 
-        return  customerList
+        List<TransactionDTO> transactionDTOS =  customerList
                 .stream()
                 .map(transaction ->{
                     propertyMapper.addMappings(
-                            mapper -> mapper.map(src -> src.getUser().getUsername(), TransactionDTO::setUsername)
+                            mapper -> {
+                                mapper.map(src -> src.getUser().getUsername(), TransactionDTO::setUsername);
+                                mapper.map(src -> src.getDate(), TransactionDTO::setDate);
+
+                            }
                     );
                     return  modelMapper.map(transaction, TransactionDTO.class);
                 } )
                 .collect(Collectors.toList());
+        String path = "D:\\reserch\\spring-boot-spring-security-jwt-authentication-master";
+        File file = ResourceUtils.getFile("classpath:bank.jrxml");
+        JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
+        JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(transactionDTOS);
+        JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, dataSource);
+        JasperExportManager.exportReportToPdfFile(jasperPrint, path+"\\testing"+".pdf");
+        return transactionDTOS;
     }
 
     public String totalPoin(String name){

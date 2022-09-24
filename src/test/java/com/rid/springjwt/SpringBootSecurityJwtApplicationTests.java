@@ -6,10 +6,12 @@ import com.rid.springjwt.models.User;
 import com.rid.springjwt.repository.TransactionRepository;
 import com.rid.springjwt.repository.UserRepository;
 import com.rid.springjwt.service.TransactionService;
+import net.sf.jasperreports.engine.JRException;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
+import java.io.FileNotFoundException;
 import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
@@ -47,7 +49,7 @@ public class SpringBootSecurityJwtApplicationTests {
 	}
 
 	@Test
-	public void report() {
+	public void report() throws FileNotFoundException, JRException {
 		ReportFilter reportFilter = new ReportFilter();
 		transactionService.historyReport(reportFilter);
 	}

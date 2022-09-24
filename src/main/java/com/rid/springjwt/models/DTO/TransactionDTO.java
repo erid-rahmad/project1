@@ -10,9 +10,14 @@ public class TransactionDTO  {
 
 
     private String name;
+
     private Integer poin;
+
     private Integer Nominal;
+
+    @DateTimeFormat(pattern = "dd-MM-yyyy")
     private Date date;
+
     private String username;
 //    private User user;
 

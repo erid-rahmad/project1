@@ -4,12 +4,14 @@ import com.rid.springjwt.models.ReportFilter;
 import com.rid.springjwt.models.Transaction;
 import com.rid.springjwt.models.DTO.TransactionDTO;
 import com.rid.springjwt.service.TransactionService;
+import net.sf.jasperreports.engine.JRException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 
+import java.io.FileNotFoundException;
 import java.util.List;
 
 @CrossOrigin(origins = "*", maxAge = 3600)
@@ -40,7 +42,7 @@ public class TestController {
 
   @PostMapping("/report")
   @PreAuthorize("hasRole('ADMIN')")
-  public List<TransactionDTO>  adminAccess(@RequestBody ReportFilter reportFilter) {
+  public List<TransactionDTO>  adminAccess(@RequestBody ReportFilter reportFilter) throws FileNotFoundException, JRException {
     return transactionService.historyReport(reportFilter);
   }
 
