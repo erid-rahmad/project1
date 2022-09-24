@@ -42,7 +42,7 @@ public class TestController {
 
   @PostMapping("/report")
   @PreAuthorize("hasRole('ADMIN')")
-  public List<TransactionDTO>  adminAccess(@RequestBody ReportFilter reportFilter) throws FileNotFoundException, JRException {
+  public String  adminAccess(@RequestBody ReportFilter reportFilter) throws FileNotFoundException, JRException {
     return transactionService.historyReport(reportFilter);
   }
 

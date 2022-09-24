@@ -25,6 +25,7 @@ import java.math.BigDecimal;
 import java.sql.Date;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
@@ -83,7 +84,7 @@ public class TransactionService {
         return transactionRepository.findbyid(user.get().getId());
     }
 
-    public List<TransactionDTO> historyReport(ReportFilter reportFilter) throws JRException, FileNotFoundException {
+    public String historyReport(ReportFilter reportFilter) throws JRException, FileNotFoundException {
         StringBuilder sql = new StringBuilder().append("SELECT * from Transaction t where t.id > 0");
 
         if (reportFilter.getUserId() != null){
@@ -101,34 +102,39 @@ public class TransactionService {
         }
         Query query = entityManager.createNativeQuery(sql.toString(),Transaction.class);
         List<Transaction> customerList = query.getResultList();
-        TypeMap<Transaction, TransactionDTO> propertyMapper = this.modelMapper.createTypeMap(Transaction.class, TransactionDTO.class);
-
         List<TransactionDTO> transactionDTOS =  customerList
                 .stream()
-                .map(transaction ->{
-                    propertyMapper.addMappings(
-                            mapper -> {
-                                mapper.map(src -> src.getUser().getUsername(), TransactionDTO::setUsername);
-                                mapper.map(src -> src.getDate(), TransactionDTO::setDate);
-
-                            }
-                    );
-                    return  modelMapper.map(transaction, TransactionDTO.class);
-                } )
+                .map(transaction ->
+                      mapingDTO(transaction)
+                 )
                 .collect(Collectors.toList());
-        String path = "D:\\reserch\\spring-boot-spring-security-jwt-authentication-master";
+        String path = "D:\\reserch\\spring-boot-spring-security-jwt-authentication-master\\report";
         File file = ResourceUtils.getFile("classpath:bank.jrxml");
         JasperReport jasperReport = JasperCompileManager.compileReport(file.getAbsolutePath());
         JRBeanCollectionDataSource dataSource = new JRBeanCollectionDataSource(transactionDTOS);
         JasperPrint jasperPrint = JasperFillManager.fillReport(jasperReport, null, dataSource);
-        JasperExportManager.exportReportToPdfFile(jasperPrint, path+"\\testing"+".pdf");
-        return transactionDTOS;
+        Random rand = new Random();
+        int upperbound = 25342341;
+        int int_random = rand.nextInt(upperbound);
+        String name = path+"\\report"+int_random+".pdf";
+        JasperExportManager.exportReportToPdfFile(jasperPrint, name);
+
+        return name;
     }
 
     public String totalPoin(String name){
         Optional<User> user = userRepository.findByUsername(name);
         BigDecimal bigDecimal =transactionRepository.curentPoin(user.get().getId());
         return bigDecimal.toString();
+    }
+
+    public TransactionDTO mapingDTO(Transaction transaction){
+        TransactionDTO transactionDTO = new TransactionDTO();
+        transactionDTO.setDate(Date.valueOf(transaction.getDate()));
+        transactionDTO.setNominal(transaction.getNominal().intValue());
+        transactionDTO.setPoin(transaction.getPoin().intValue());
+        transactionDTO.setUsername(transaction.getUser().getUsername());
+        return transactionDTO;
     }
 
 }
