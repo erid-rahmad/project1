@@ -3,15 +3,15 @@ package com.rid.springjwt;
 import com.rid.springjwt.models.ReportFilter;
 import com.rid.springjwt.models.Transaction;
 import com.rid.springjwt.models.User;
+import com.rid.springjwt.repository.TransactionRepository;
 import com.rid.springjwt.repository.UserRepository;
-import com.rid.springjwt.security.services.TransactionService;
-import org.aspectj.lang.annotation.Before;
-import org.junit.jupiter.api.BeforeEach;
+import com.rid.springjwt.service.TransactionService;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.Optional;
 
 @SpringBootTest
@@ -23,27 +23,12 @@ public class SpringBootSecurityJwtApplicationTests {
 	@Autowired
 	UserRepository userRepository;
 
-//	@BeforeEach
-
-
+	@Autowired
+	TransactionRepository transactionRepository;
 
 	@Test
 	public void transaksi() {
-
-		Transaction transaction = new Transaction();
-		Optional<User> user = userRepository.findByUsername("rid");
-
-		transaction.setUser(user.get());
-		transaction.setNominal(new BigDecimal(30000));
-		transaction.setName("PULSA");
-
-		transactionService.BeliPulsa(transaction,user.get().getUsername());
-
-
-		transaction.setName("LISTRIK TES");
-		transactionService.BeliPulsa(transaction,user.get().getUsername());
-
-
+		transactionService.totalPoin("rid");
 	}
 
 	@Test
@@ -52,11 +37,18 @@ public class SpringBootSecurityJwtApplicationTests {
 	}
 
 	@Test
+	public void BeliPulsa() {
+		Transaction transaction = new Transaction();
+		List<User> user = userRepository.findAll();
+		transaction.setName("PULSA");
+		transaction.setUser(user.get(0));
+		transaction.setNominal(new BigDecimal(90000));
+		transactionService.BeliPulsa(transaction,"rid");
+	}
+
+	@Test
 	public void report() {
-		Optional<User> user = userRepository.findByUsername("rid");
 		ReportFilter reportFilter = new ReportFilter();
-		transactionService.historyReport(reportFilter);
-		reportFilter.setUserId(user.get().getId().intValue());
 		transactionService.historyReport(reportFilter);
 	}
 

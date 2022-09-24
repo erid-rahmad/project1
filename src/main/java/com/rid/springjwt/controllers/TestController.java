@@ -2,10 +2,9 @@ package com.rid.springjwt.controllers;
 
 import com.rid.springjwt.models.ReportFilter;
 import com.rid.springjwt.models.Transaction;
-import com.rid.springjwt.models.TransactionDTO;
-import com.rid.springjwt.security.services.TransactionService;
+import com.rid.springjwt.models.DTO.TransactionDTO;
+import com.rid.springjwt.service.TransactionService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.access.prepost.PostAuthorize;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
@@ -22,8 +21,8 @@ public class TestController {
   TransactionService transactionService;
 
   @GetMapping("/all")
-  public String allAccess() {
-    return "Public Content.";
+  public String allAccess(Authentication authentication) {
+    return transactionService.totalPoin(authentication.getName());
   }
 
   @GetMapping("/history")

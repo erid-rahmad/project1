@@ -1,5 +1,7 @@
 package com.rid.springjwt.models;
 
+import com.sun.istack.NotNull;
+
 import java.util.HashSet;
 import java.util.Set;
 
@@ -19,18 +21,19 @@ public class User {
   @GeneratedValue(strategy = GenerationType.IDENTITY)
   private Long id;
 
-  @NotBlank
+  @NotNull
   @Size(max = 20)
   private String username;
 
-  @NotBlank
+  @NotNull
   @Size(max = 50)
   @Email
   private String email;
 
-  @NotBlank
+  @NotNull
   @Size(max = 120)
   private String password;
+
 
   @ManyToMany(fetch = FetchType.LAZY)
   @JoinTable(  name = "user_roles", 

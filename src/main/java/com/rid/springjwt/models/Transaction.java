@@ -16,19 +16,19 @@ public class Transaction {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank
+    @NotNull
     private String name;
 
     private BigDecimal poin;
 
-    @NotBlank
+    @NotNull
     private BigDecimal Nominal;
 
     @DateTimeFormat(pattern = "dd-MM-yyyy")
     @Column(name = "date")
     private LocalDate date;
 
-    @NotBlank
+    @NotNull
     @ManyToOne(optional = false)
     private User User;
 

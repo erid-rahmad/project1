@@ -1,4 +1,4 @@
-package com.rid.springjwt.models;
+package com.rid.springjwt.models.DTO;
 
 import org.springframework.format.annotation.DateTimeFormat;
 

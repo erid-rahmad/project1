@@ -1,14 +1,12 @@
-package com.rid.springjwt.security.services;
+package com.rid.springjwt.service;
 
-import com.rid.springjwt.mapper.TransactionMapper;
 import com.rid.springjwt.models.ReportFilter;
 import com.rid.springjwt.models.Transaction;
-import com.rid.springjwt.models.TransactionDTO;
+import com.rid.springjwt.models.DTO.TransactionDTO;
 import com.rid.springjwt.models.User;
 import com.rid.springjwt.repository.TransactionRepository;
 import com.rid.springjwt.repository.UserRepository;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.PropertyMap;
 import org.modelmapper.TypeMap;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -34,17 +32,12 @@ public class TransactionService {
     @Autowired
     UserRepository userRepository;
 
-
-    TransactionMapper transactionMapper;
-
-
     private final ModelMapper modelMapper;
-
-
 
     private final EntityManager entityManager;
 
-    public TransactionService(ModelMapper modelMapper, EntityManager entityManager) {
+    public TransactionService(  ModelMapper modelMapper, EntityManager entityManager) {
+
         this.modelMapper = modelMapper;
         this.entityManager = entityManager;
     }
@@ -99,14 +92,23 @@ public class TransactionService {
         }
         Query query = entityManager.createNativeQuery(sql.toString(),Transaction.class);
         List<Transaction> customerList = query.getResultList();
+        TypeMap<Transaction, TransactionDTO> propertyMapper = this.modelMapper.createTypeMap(Transaction.class, TransactionDTO.class);
 
         return  customerList
                 .stream()
-                .map(transaction -> modelMapper.map(transaction, TransactionDTO.class))
+                .map(transaction ->{
+                    propertyMapper.addMappings(
+                            mapper -> mapper.map(src -> src.getUser().getUsername(), TransactionDTO::setUsername)
+                    );
+                    return  modelMapper.map(transaction, TransactionDTO.class);
+                } )
                 .collect(Collectors.toList());
+    }
 
-
-
+    public String totalPoin(String name){
+        Optional<User> user = userRepository.findByUsername(name);
+        BigDecimal bigDecimal =transactionRepository.curentPoin(user.get().getId());
+        return bigDecimal.toString();
     }
 
 }

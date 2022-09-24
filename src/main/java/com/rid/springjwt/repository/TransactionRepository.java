@@ -11,6 +11,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 
@@ -19,16 +20,7 @@ public interface TransactionRepository extends JpaRepository<Transaction, Long>,
     @Query("select a from Transaction a where a.User.id =?1")
     List<Transaction> findbyid(Long id);
 
-    @Query("FROM Transaction t where t.User =:user")
-    List<Transaction> findbyid1(
-            @Param("user") Long user
-
-    );
-
-
-
-
-
-
+    @Query("select sum(a.poin) from Transaction a where a.User.id =?1")
+    BigDecimal curentPoin(Long id);
 
 }
